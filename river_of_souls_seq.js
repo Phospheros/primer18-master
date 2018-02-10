@@ -3,25 +3,32 @@
 var souls = [];
 var windowRes, soulNum;
 var clockStart, clockEnd, lapsedTime;
-var v = 2;
+var v;
+var bground, onionSkin, commLines, soulStroke, soulFill;							// Color declarations.
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  background(0);
-  frameRate(30);
+  bground = color(255);																// Color definitions.
+  onionSkin = color(255, 30);
+  soulStroke = color(214, 25);
+  soulFill = color(214, 3);
+  background(bground);
+  v = 2;
   windowRes = windowWidth * windowHeight;
   soulNum = int(windowRes / 30000);
   soulNum = constrain(soulNum, 12, 33);
   for (var i = 0; i < soulNum; i++) {												// Initialize souls.
     souls[i] = new Soul();
   }
+  frameRate(30);
 }
 
-function draw() {  
+function draw() {
+
   noStroke();															  			// Onion skin layer.
-  fill(0, 18);
+  fill(onionSkin);
   rect(0, 0, width, height);
-  
+
   for (var i = 0; i < souls.length; i++) {											// Invoke souls.
     souls[i].show();
     souls[i].move();
@@ -31,21 +38,22 @@ function draw() {
         var soulsDistance = dist(souls[i].x, souls[i].y, souls[j].x, souls[j].y);	// Total distance.
         var soulSpace = souls[i].d / 2 + souls[j].d / 2;							// Touch Radius.
         var communionDistance = 150;
-        var lineWeight = 50/soulsDistance;
-        
-        if (soulsDistance <= communionDistance) {		          					// Communion lines.    
-          stroke(lineWeight * 200, lineWeight, lineWeight, 6);
-          line(souls[i].x, souls[i].y, souls[j].x, souls[j].y); 
+
+        if (soulsDistance <= communionDistance) {		          					// Communion lines.
+          var lineWeight = 50/soulsDistance;
+          commLines = color(lineWeight * 80, lineWeight, lineWeight, 1);			// Communion lines color.
+          stroke(commLines);
+          line(souls[i].x, souls[i].y, souls[j].x, souls[j].y);
         }
-        
+
         if (soulsDistance <= soulSpace) {											// Adhesion. (Average velocities).
-          souls[i].xv = souls[j].xv = (souls[i].xv + souls[j].xv) / 2; 
+          souls[i].xv = souls[j].xv = (souls[i].xv + souls[j].xv) / 2;
           souls[i].yv = souls[j].yv = (souls[i].yv + souls[j].yv) / 2;
-          
+
           clockStart = (clockStart == 0) ? millis() : 0;							// Set timer.
           clockEnd = random(15000, 200000);
           timeLapse = millis() - clockStart;
-          
+
           if (timeLapse >= clockEnd) {												// Separation.
             clockStart = 0;
             clockEnd = 20;
@@ -53,16 +61,16 @@ function draw() {
   			souls[i].yv = random(-v, v);
             souls[j].xv = random(-v, v);
   			souls[j].yv = random(-v, v);
-          }	  // End if timer.          
+          }	  // End if timer.
         }	// End if collision/adhesion.
       }	  // End if i != j.
     }	// End for j.
-    
+
         strokeWeight(lineWeight);													// Inner glow.
     	for (var k = 0; k < 14; k++) {
-      	  bezier(souls[i].x, souls[i].y, 
-          souls[i].x + random(-50, 50), souls[i].y + random(-50, 50), 
-          souls[i].x + random(-50, 50), souls[i].y + random(-50, 50), 
+      	  bezier(souls[i].x, souls[i].y,
+          souls[i].x + random(-50, 50), souls[i].y + random(-50, 50),
+          souls[i].x + random(-50, 50), souls[i].y + random(-50, 50),
           souls[i].x, souls[i].y);
     }	// End glow.
   }	  // End for i.
@@ -77,14 +85,14 @@ function Soul() {											 // Setup.
   this.y = random(this.d, windowHeight - this.d);
   this.xv = random(-v, v);
   this.yv = random(-v, v);
-  
+
   this.show = function() {									 // Display.
-    stroke(100, 10, 200, 10);
+    stroke(soulStroke);
     strokeWeight(2);
-    fill(100, 10, 200, 5);  
-    ellipse(this.x, this.y, this.d, this.d);    
+    fill(soulFill);
+    ellipse(this.x, this.y, this.d, this.d);
   }
-  
+
   this.move = function() {									 // Behavior (non-interactive).
     this.x += this.xv;
     this.y += this.yv;
@@ -105,8 +113,8 @@ function windowResized() {									 // Adaptive/responsive design feature.
     for (var i = 0; i < soulNum; i++) {						 // Re-initialize souls in new environment.
       souls[i] = new Soul();
     }
-  
-  	background(0);
+
+  	background(bground);
 }
 
 // ====================== End ====================== //
