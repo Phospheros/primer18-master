@@ -1,14 +1,14 @@
-// R.A. Robertson "River of Souls Sequel" 2017
+// R.A. Robertson "River of Souls Sequel" 2017-2018 Creative Commons SA
 
 var souls = [];
 var windowRes, soulNum;
 var clockStart, clockEnd, lapsedTime;
 var v;
-var bground, onionSkin, commLines, soulStroke, soulFill;							// Color declarations.
+var bground, onionSkin, commLines, soulStroke, soulFill;		// Color declarations.
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  bground = color(255);																// Color definitions.
+  bground = color(255);										                  // Color definitions.
   onionSkin = color(255, 30);
   soulStroke = color(214, 25);
   soulFill = color(214, 3);
@@ -17,7 +17,7 @@ function setup() {
   windowRes = windowWidth * windowHeight;
   soulNum = int(windowRes / 30000);
   soulNum = constrain(soulNum, 12, 33);
-  for (var i = 0; i < soulNum; i++) {												// Initialize souls.
+  for (var i = 0; i < soulNum; i++) {												 // Initialize souls.
     souls[i] = new Soul();
   }
   frameRate(30);
@@ -25,36 +25,36 @@ function setup() {
 
 function draw() {
 
-  noStroke();															  			// Onion skin layer.
+  noStroke();															  			                                // Onion skin layer.
   fill(onionSkin);
   rect(0, 0, width, height);
 
-  for (var i = 0; i < souls.length; i++) {											// Invoke souls.
+  for (var i = 0; i < souls.length; i++) {											                  // Invoke souls.
     souls[i].show();
     souls[i].move();
 
-    for (var j = 0; j < souls.length; j++) {										// Soul interaction.
+    for (var j = 0; j < souls.length; j++) {										                  // Soul interaction.
       if (i != j) {
         var soulsDistance = dist(souls[i].x, souls[i].y, souls[j].x, souls[j].y);	// Total distance.
-        var soulSpace = souls[i].d / 2 + souls[j].d / 2;							// Touch Radius.
+        var soulSpace = souls[i].d / 2 + souls[j].d / 2;							            // Touch Radius.
         var communionDistance = 150;
 
-        if (soulsDistance <= communionDistance) {		          					// Communion lines.
+        if (soulsDistance <= communionDistance) {		          					          // Communion lines.
           var lineWeight = 50/soulsDistance;
-          commLines = color(lineWeight * 80, lineWeight, lineWeight, 1);			// Communion lines color.
+          commLines = color(lineWeight * 80, lineWeight, lineWeight, 1);			    // Communion lines color.
           stroke(commLines);
           line(souls[i].x, souls[i].y, souls[j].x, souls[j].y);
         }
 
-        if (soulsDistance <= soulSpace) {											// Adhesion. (Average velocities).
+        if (soulsDistance <= soulSpace) {											                    // Adhesion. (Average velocities).
           souls[i].xv = souls[j].xv = (souls[i].xv + souls[j].xv) / 2;
           souls[i].yv = souls[j].yv = (souls[i].yv + souls[j].yv) / 2;
 
-          clockStart = (clockStart == 0) ? millis() : 0;							// Set timer.
+          clockStart = (clockStart == 0) ? millis() : 0;							            // Set timer.
           clockEnd = random(15000, 200000);
           timeLapse = millis() - clockStart;
 
-          if (timeLapse >= clockEnd) {												// Separation.
+          if (timeLapse >= clockEnd) {												                    // Separation.
             clockStart = 0;
             clockEnd = 20;
             souls[i].xv = random(-v, v);
@@ -79,21 +79,21 @@ function draw() {
 // ====================== Soul Object ====================== //
 
 function Soul() {											 // Setup.
-  this.d = int(random(10, windowRes * 0.00015));			 // Adaptive/responsive sizing.
+  this.d = int(random(10, windowRes * 0.00015));			       // Adaptive/responsive sizing.
   this.d = constrain(this.d, 10, int(random(10, 150)));
   this.x = random(this.d, windowWidth - this.d);
   this.y = random(this.d, windowHeight - this.d);
   this.xv = random(-v, v);
   this.yv = random(-v, v);
 
-  this.show = function() {									 // Display.
+  this.show = function() {									                 // Display.
     stroke(soulStroke);
     strokeWeight(2);
     fill(soulFill);
     ellipse(this.x, this.y, this.d, this.d);
   }
 
-  this.move = function() {									 // Behavior (non-interactive).
+  this.move = function() {									                 // Behavior (non-interactive).
     this.x += this.xv;
     this.y += this.yv;
     this.xv = (this.x > windowWidth - this.d / 2 || this.x < 0 + this.d / 2) ? -this.xv : this.xv;
@@ -103,18 +103,25 @@ function Soul() {											 // Setup.
 
 // ====================== Functions ====================== //
 
-function windowResized() {									 // Adaptive/responsive design feature.
-	//resizeCanvas(windowWidth, windowHeight);				 // Does not work as well here as width, height.
+function windowResized() {									                 // Adaptive/responsive design feature.
+	//resizeCanvas(windowWidth, windowHeight);				         // Does not work as well here as width, height.
     resizeCanvas(width, height);
     souls = [];
     windowRes = windowWidth * windowHeight;
     soulNum = int(windowRes / 30000);
   	soulNum = constrain(soulNum, 12, 33);
-    for (var i = 0; i < soulNum; i++) {						 // Re-initialize souls in new environment.
+    for (var i = 0; i < soulNum; i++) {						           // Re-initialize souls in new environment.
       souls[i] = new Soul();
     }
 
   	background(bground);
 }
+
+// ====================== UI ====================== //
+
+// function keyPressed() {
+//     var timeStamp = (new Date).getTime();
+// 	if (key == 'i' || key == 'I') saveCanvas('river_frame_' + timeStamp, 'png');       // DEV PURPOSES ONLY -- REMOVE FOR GOLIVE !!!
+// }
 
 // ====================== End ====================== //
