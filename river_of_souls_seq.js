@@ -7,11 +7,12 @@ var v;
 var bground, onionSkin, commLines, soulStroke, soulFill;		// Color declarations.
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  var canvas = createCanvas(windowWidth, windowHeight);
+  canvas.parent();
   bground = color(255);										                  // Color definitions.
   onionSkin = color(255, 30);
   soulStroke = color(214, 25);
-  soulFill = color(214, 3);
+  soulFill = color(0, 126, 255, 1);
   background(bground);
   v = 2;
   windowRes = windowWidth * windowHeight;
