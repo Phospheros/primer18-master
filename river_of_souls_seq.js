@@ -11,13 +11,14 @@ function setup() {
   canvas.parent();
   bground = color(255);										                  // Color definitions.
   onionSkin = color(255, 30);
-  soulStroke = color(214, 125);
+  soulStroke = color(214, 225);
   soulFill = color(0, 126, 255, 1);
   background(bground);
   v = 2;
   windowRes = windowWidth * windowHeight;
-  soulNum = int(windowRes / 30000);
-  soulNum = constrain(soulNum, 12, 33);
+  // soulNum = int(windowRes / 30000);
+                                              soulNum = 10; // Dev testing.
+  // soulNum = constrain(soulNum, 12, 33);
   for (var i = 0; i < soulNum; i++) {												 // Initialize souls.
     souls[i] = new Soul();
   }
@@ -31,7 +32,7 @@ function draw() {
   rect(0, 0, width, height);
 
   for (var i = 0; i < souls.length; i++) {											                  // Invoke souls.
-    souls[i].show();
+    // souls[i].show();
     souls[i].move();
 
     for (var j = 0; j < souls.length; j++) {										                  // Soul interaction.
@@ -42,10 +43,27 @@ function draw() {
 
         if (soulsDistance <= communionDistance) {		          					          // Communion lines.
           var lineWeight = 50/soulsDistance;
-          commLines = color(lineWeight * 80, lineWeight, lineWeight, 1);			    // Communion lines color.
+          commLines = color(lineWeight * 80, lineWeight, lineWeight, 10);			    // Communion lines color.
           stroke(commLines);
           line(souls[i].x, souls[i].y, souls[j].x, souls[j].y);
-        }
+        } // End Communion lines.
+
+
+        var radFract, limit, lerpX, lerpY;
+        radFract = (souls[i].d / 2) / soulsDistance;
+
+        for (var k = 1; k < souls[i].d; k++) {    // Gradient loop.
+          limit = (soulsDistance > souls[i].d / 2) ? k/souls[i].d * radFract : k/souls[i].d;
+          lerpX = lerp(souls[i].x, souls[j].x, limit);
+          lerpY = lerp(souls[i].y, souls[j].y, limit);
+          fill(k/1.5 * int(255 / souls[i].d), k * int(255 / souls[i].d) );
+                    // ellipse(souls[i].x, souls[i].y, souls[i].d - k, souls[i].d - k);
+          ellipse(lerpX, lerpY, souls[i].d - k, souls[i].d - k);
+        } // End gradient.
+
+
+
+
 
         if (soulsDistance <= soulSpace) {											                    // Adhesion. (Average velocities).
           souls[i].xv = souls[j].xv = (souls[i].xv + souls[j].xv) / 2;
@@ -90,7 +108,7 @@ function Soul() {											 // Setup.
   this.show = function() {									                 // Display.
     stroke(soulStroke);
     strokeWeight(2);
-    // fill(soulFill);
+    fill(soulFill);
     ellipse(this.x, this.y, this.d, this.d);
   }
 
