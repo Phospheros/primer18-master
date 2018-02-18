@@ -11,7 +11,7 @@ function setup() {
   canvas.parent();
   bground = color(255);										                  // Color definitions.
   onionSkin = color(255, 30);
-  soulStroke = color(214, 25);
+  soulStroke = color(214, 125);
   soulFill = color(0, 126, 255, 1);
   background(bground);
   v = 2;
@@ -67,13 +67,13 @@ function draw() {
       }	  // End if i != j.
     }	// End for j.
 
-        strokeWeight(lineWeight);													// Inner glow.
-    	for (var k = 0; k < 14; k++) {
-      	  bezier(souls[i].x, souls[i].y,
-          souls[i].x + random(-50, 50), souls[i].y + random(-50, 50),
-          souls[i].x + random(-50, 50), souls[i].y + random(-50, 50),
-          souls[i].x, souls[i].y);
-    }	// End glow.
+      //   strokeWeight(lineWeight);													// Inner glow.
+    	// for (var k = 0; k < 14; k++) {
+      // 	  bezier(souls[i].x, souls[i].y,
+      //     souls[i].x + random(-50, 50), souls[i].y + random(-50, 50),
+      //     souls[i].x + random(-50, 50), souls[i].y + random(-50, 50),
+      //     souls[i].x, souls[i].y);
+    // }	// End glow.
   }	  // End for i.
 }	// End draw.
 
@@ -90,7 +90,7 @@ function Soul() {											 // Setup.
   this.show = function() {									                 // Display.
     stroke(soulStroke);
     strokeWeight(2);
-    fill(soulFill);
+    // fill(soulFill);
     ellipse(this.x, this.y, this.d, this.d);
   }
 
