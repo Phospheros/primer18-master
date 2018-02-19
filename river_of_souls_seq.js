@@ -17,10 +17,10 @@ function setup() {
   v = 2;
   windowRes = windowWidth * windowHeight;
   // soulNum = int(windowRes / 30000);
-                                              soulNum = 10; // Dev testing.
+                                              soulNum = 15; // Dev testing. Update windowResized also.
   // soulNum = constrain(soulNum, 12, 33);
   for (var i = 0; i < soulNum; i++) {												 // Initialize souls.
-    souls[i] = new Soul();
+    souls[i] = new Soul();                // ??? Look this up.
   }
   frameRate(30);
 }
@@ -32,37 +32,83 @@ function draw() {
   rect(0, 0, width, height);
 
   for (var i = 0; i < souls.length; i++) {											                  // Invoke souls.
-    // souls[i].show();
+    souls[i].show();
     souls[i].move();
 
     for (var j = 0; j < souls.length; j++) {										                  // Soul interaction.
       if (i != j) {
         var soulsDistance = dist(souls[i].x, souls[i].y, souls[j].x, souls[j].y);	// Total distance.
         var soulSpace = souls[i].d / 2 + souls[j].d / 2;							            // Touch Radius.
-        var communionDistance = 150;
+        var communionDistance = soulSpace + 150;
 
-        if (soulsDistance <= communionDistance) {		          					          // Communion lines.
-          var lineWeight = 50/soulsDistance;
-          commLines = color(lineWeight * 80, lineWeight, lineWeight, 10);			    // Communion lines color.
-          stroke(commLines);
+
+
+
+        if (soulsDistance <= communionDistance) {		          					          // Communion.
+          var lineWeight = 15/soulsDistance;
+          commLines = color(lineWeight * 80, lineWeight, lineWeight, 50);			    // Communion lines color.
+strokeWeight(lineWeight);
+          stroke(commLines, lineWeight);
           line(souls[i].x, souls[i].y, souls[j].x, souls[j].y);
-        } // End Communion lines.
 
 
-        var radFract, limit, lerpX, lerpY;
-        radFract = (souls[i].d / 2) / soulsDistance;
+// New code mostly here.
 
-        for (var k = 1; k < souls[i].d; k++) {    // Gradient loop.
-          limit = (soulsDistance > souls[i].d / 2) ? k/souls[i].d * radFract : k/souls[i].d;
-          lerpX = lerp(souls[i].x, souls[j].x, limit);
-          lerpY = lerp(souls[i].y, souls[j].y, limit);
-          fill(k/1.5 * int(255 / souls[i].d), k * int(255 / souls[i].d) );
-                    // ellipse(souls[i].x, souls[i].y, souls[i].d - k, souls[i].d - k);
-          ellipse(lerpX, lerpY, souls[i].d - k, souls[i].d - k);
-        } // End gradient.
+        // var radFract, limit, lerpX, lerpY;
+        // radFract = (souls[i].d / 2) / soulsDistance;
+        //
+        // for (var k = 1; k < souls[i].d; k++) {    // Gradient loop.
+        //   limit = (soulsDistance > souls[i].d / 2) ? k/souls[i].d * radFract : k/souls[i].d;
+        //   lerpX = lerp(souls[i].x, souls[j].x, limit);
+        //   lerpY = lerp(souls[i].y, souls[j].y, limit);
+        //   noStroke();
+        //   fill(k/1.5 * int(255 / souls[i].d), k * int(255 / souls[i].d) );
+        //   // fill(k/1.5 * int(255 / souls[i].d), lineWeight * k );
+        //   ellipse(lerpX, lerpY, souls[i].d - k, souls[i].d - k);
+        // } // End gradient.
+        //
+        // fill(onionSkin, 255/ (communionDistance - soulsDistance) );
+        // ellipse(souls[i].x, souls[i].y, souls[i].d, souls[i].d);
 
 
 
+        // This may or may not be useful. Still testing. Would like to be able to fade in orbs.
+        // 0 - 150 ==> 0 - 255
+        // var fadeIn = int(soulsDistance - soulSpace) * (255/communionDistance);
+        // var fadeInSize = abs(int(soulsDistance - soulSpace) * (souls[i].d/communionDistance));
+
+
+
+        // This block is to bring in perimeters center code.
+
+        noFill();
+        // strokeWeight(4);
+        var v1 = createVector(souls[i].x, souls[i].y);
+        var v2 = createVector(souls[j].x, souls[j].y);
+        // var centersDistVal = p5.Vector.dist(v1, v2);	   // Get distance
+        var radFract1 = (souls[i].d/2) / soulsDistance;			   // Get fraction radius1:dist
+        var radFract2 = (souls[j].d/2) / soulsDistance;				 // Get fraction radius2:dist
+        var lerpV1 = p5.Vector.lerp(v1, v2, radFract1);	 // Interpolate per fraction1
+        var lerpV2 = p5.Vector.lerp(v2, v1, radFract2);	 // Interpolate per fraction2
+        stroke('red');
+        ellipse(lerpV1.x, lerpV1.y, 4, 4);						 // Show perimeter near points
+        ellipse(lerpV2.x, lerpV2.y, 4, 4);
+        var v3 = createVector(lerpV1.x, lerpV1.y);			 // Location of perimeter point1
+        var v4 = createVector(lerpV2.x, lerpV2.y);       // Location of perimeter point2
+        var lerpPerimeters = p5.Vector.lerp(v3, v4, 0.5); // Set pt along perimeter line
+        line(souls[i].x, souls[i].y, souls[j.x], souls[j].y);
+        var radAverage = (souls[i].d + souls[j].d) / 2;
+        radAverage = map(soulsDistance, communionDistance, 0,  0, radAverage);
+        stroke(color('blue'));
+        ellipse(lerpPerimeters.x, lerpPerimeters.y, radAverage, radAverage);
+
+
+
+
+
+// End new code block.
+
+        } // End Communion.
 
 
         if (soulsDistance <= soulSpace) {											                    // Adhesion. (Average velocities).
@@ -92,7 +138,9 @@ function draw() {
       //     souls[i].x + random(-50, 50), souls[i].y + random(-50, 50),
       //     souls[i].x, souls[i].y);
     // }	// End glow.
+
   }	  // End for i.
+
 }	// End draw.
 
 // ====================== Soul Object ====================== //
@@ -108,7 +156,7 @@ function Soul() {											 // Setup.
   this.show = function() {									                 // Display.
     stroke(soulStroke);
     strokeWeight(2);
-    fill(soulFill);
+    // fill(soulFill);
     ellipse(this.x, this.y, this.d, this.d);
   }
 
@@ -127,8 +175,9 @@ function windowResized() {									                 // Adaptive/responsive desig
     resizeCanvas(width, height);
     souls = [];
     windowRes = windowWidth * windowHeight;
-    soulNum = int(windowRes / 30000);
-  	soulNum = constrain(soulNum, 12, 33);
+    // soulNum = int(windowRes / 30000);
+  	// soulNum = constrain(soulNum, 12, 33);
+                                                soulNum = 10;
     for (var i = 0; i < soulNum; i++) {						           // Re-initialize souls in new environment.
       souls[i] = new Soul();
     }
