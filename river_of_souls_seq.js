@@ -1,4 +1,5 @@
 // R.A. Robertson "River of Souls Sequel" 2017-2018 Creative Commons SA
+// Branched project "Orb Variant" in collaboration in visual design with vurv collective 2018.
 
 var souls = [];
 var windowRes, soulNum;
@@ -11,7 +12,7 @@ function setup() {
   canvas.parent();
   bground = color(255);										                  // Color definitions.
   onionSkin = color(20, 30);
-  soulStroke = color(214, 150);
+  soulStroke = color(214, 3);
   soulFill = color(0, 126, 255, 1);
   background(bground);
   v = 2;
@@ -20,10 +21,13 @@ function setup() {
                                               soulNum = 12; // Dev testing. Update windowResized also.
   // soulNum = constrain(soulNum, 12, 33);
   for (var i = 0; i < soulNum; i++) {												 // Initialize souls.
-    souls[i] = new Soul();                // ??? Look this up.
+    souls[i] = new Soul();
   }
   frameRate(30);
 }
+
+
+
 
 function draw() {
 
@@ -32,17 +36,38 @@ function draw() {
   rect(0, 0, width, height);
 
   for (var i = 0; i < souls.length; i++) {											                  // Invoke souls.
-    souls[i].show();
-    souls[i].move();
+    // souls[i].show();
 
+
+    // stroke((soulsDistance >= threshold) ? soulStroke : 0);
+    if (soulsDistance > communionDistance) {
+      stroke(soulStroke);
+      strokeWeight(10);
+      point(souls[i].x, souls[i].y);
+    }
+
+
+
+    souls[i].move();
     for (var j = 0; j < souls.length; j++) {										                  // Soul interaction.
+
       if (i != j) {
         var soulsDistance = dist(souls[i].x, souls[i].y, souls[j].x, souls[j].y);	// Total distance.
         var soulSpace = souls[i].d / 2 + souls[j].d / 2;							            // Touch Radius.
-        var communionDistance = soulSpace + 150;
+        var communionDistance = soulSpace + threshold;                                  // Activation threshold plus radii.
 
 
 
+
+
+
+
+
+        // GrowD paremeters. Move elsewhere during cleanup.
+        var threshold = 150;
+        var separation = soulsDistance - soulSpace;
+        var distThreshRatio = separation/threshold;
+        var growD =	souls[i].d - (souls[i].d * distThreshRatio);
 
         if (soulsDistance <= communionDistance) {		          					          // Communion.
           // var lineWeight = 15/soulsDistance;
@@ -52,29 +77,28 @@ function draw() {
           // line(souls[i].x, souls[i].y, souls[j].x, souls[j].y);
 
 
-// New code mostly here.
-
-        var radFract, limit, lerpX, lerpY;
-        radFract = (souls[i].d / 2) / soulsDistance;
-
-        for (var k = 1; k < souls[i].d; k++) {    // Gradient loop.
-          limit = (soulsDistance > souls[i].d / 2) ? k/souls[i].d * radFract : k/souls[i].d;
-          lerpX = lerp(souls[i].x, souls[j].x, limit);
-          lerpY = lerp(souls[i].y, souls[j].y, limit);
-          noStroke();
-          fill(k/1.5 * int(255 / souls[i].d), k * int(255 / souls[i].d) );  // Tweak alpha for interest.
-          ellipse(lerpX, lerpY, souls[i].d - k, souls[i].d - k);
-        } // End gradient.
 
 
-        // This may or may not be useful. Still testing. Would like to be able to fade in orbs.
-        // 0 - 150 ==> 0 - 255
-        // var fadeIn = int(soulsDistance - soulSpace) * (255/communionDistance);
-        // var fadeInSize = abs(int(soulsDistance - soulSpace) * (souls[i].d/communionDistance));
+       // This block creates the gradient orbs.
 
+       // Halo, or corona.
+       stroke(soulStroke);
+       strokeWeight(6);
+       ellipse(souls[i].x, souls[i].y, growD, growD);
 
+       var radFract, limit, lerpX, lerpY;
+       radFract = (souls[i].d / 2) / soulsDistance;
 
-        // This block is to bring in perimeters center code.
+       for (var k = 1; k <= growD; k++) { // Gradient loop.
+         limit = (soulsDistance > souls[i].d / 2) ? k / souls[i].d * radFract : k / souls[i].d;
+         lerpX = lerp(souls[i].x, souls[j].x, limit);
+         lerpY = lerp(souls[i].y, souls[j].y, limit);
+         noStroke();
+         fill(k / 1.5 * int(255 / souls[i].d), k * int(255 / souls[i].d)); // Tweak alpha for interest.
+         ellipse(lerpX, lerpY, growD - k,  growD - k);
+       } // End gradient.
+
+        // This block is to bring in perimeters center code for shine.
 
         noFill();
         // strokeWeight(4);
@@ -99,23 +123,23 @@ function draw() {
 
 
 
-stroke(255, radAverage/32);
-strokeWeight(1);
-var r = radAverage;
-var gain = 3;
-for (var l = 0; l < 150; l++) {
-  var x1 = randomGaussian(souls[i].x, (l + r) / gain);
-  var y1 = randomGaussian(souls[i].y, (l + r) / gain);
-  var x2 = randomGaussian(souls[j].x, (l + r) / gain);
-  var y2 = randomGaussian(souls[j].y, (l + r) / gain);
-  line(x1, y1, lerpPerimeters.x, lerpPerimeters.y);
-  line(x2, y2, lerpPerimeters.x, lerpPerimeters.y);
+        stroke(255, radAverage / 64);
+        strokeWeight(1);
+        var r = radAverage;
+        var gain = 3;
+        for (var l = 0; l < 150; l++) {
+          var x1 = randomGaussian(souls[i].x, (l + r) / gain);
+          var y1 = randomGaussian(souls[i].y, (l + r) / gain);
+          var x2 = randomGaussian(souls[j].x, (l + r) / gain);
+          var y2 = randomGaussian(souls[j].y, (l + r) / gain);
+          line(x1, y1, lerpPerimeters.x, lerpPerimeters.y);
+          line(x2, y2, lerpPerimeters.x, lerpPerimeters.y);
 
-  // Or, the simpler way:
-  // var x1 = randomGaussian(lerpPerimeters.x, (l + r) / gain);
-  // var y1 = randomGaussian(lerpPerimeters.y, (l + r) / gain);
-  // line(x1, y1, lerpPerimeters.x, lerpPerimeters.y);
-}
+          // Or, the simpler way:
+          // var x1 = randomGaussian(lerpPerimeters.x, (l + r) / gain);
+          // var y1 = randomGaussian(lerpPerimeters.y, (l + r) / gain);
+          // line(x1, y1, lerpPerimeters.x, lerpPerimeters.y);
+        }
 
 
 
@@ -161,7 +185,7 @@ for (var l = 0; l < 150; l++) {
 
 function Soul() {											                       // Setup.
   this.d = int(random(10, windowRes * 0.00015));			       // Adaptive/responsive sizing.
-  this.d = constrain(this.d, 30, int(random(30, 150)));
+  this.d = constrain(this.d, 30, int(random(30, 200)));
   this.x = random(this.d, windowWidth - this.d);
   this.y = random(this.d, windowHeight - this.d);
   this.xv = random(-v, v);
