@@ -8,6 +8,9 @@ var windowRes;                                              // Display resolutio
 var clockStart, clockEnd, lapsedTime;                       // Timer.
 var v;                                                      // Velocity.
 var bground, onionSkin, commLines, soulStroke, soulFill;		// Color declarations.
+var gradient, gradientFocus, gradientDiffuse;
+var seed, halo, shine;
+var grounding1, grounding2, spot1, spot2, support1, support2, support3;
 var soulsDistance, soulSpace, communionDistance, threshold; // Spacing variables.
 var separation, distThreshRatio, growD;
 var radFract, limit, lerpX, lerpY;                          // Gradient variables.
@@ -20,10 +23,29 @@ var r, gain, x1, y1, x2, y2;                                // Shine variables.
 function setup() {
   createCanvas(windowWidth, windowHeight);
 
-  bground = color(20);										                  // Color definitions.
-  onionSkin = color(20, 30);
-  soulStroke = color(214, 3);
-  soulFill = color(0, 126, 255, 1);
+  // ~~~~~~~~~~~~~~~~~~ Colors ~~~~~~~~~~~~~~~~~~ //
+
+  // Dayan's preliminary color palette.
+  grounding1 = color(47, 47, 47, 1);                      //  #2f2f2f	// Charcoal.
+  spot1 = color(101, 123, 123, 255);                        //  #657b7b	// Teal pastel.
+  spot2 = color(68, 109, 242, 30);                          //  #446df2	// Blue.
+  support1 = color(255, 149, 171, 30);                     //  #ff95ab	// Coral.
+  support2 = color(0, 183, 171, 255);                       //  #00b7ab	// Green.
+  support3 = color(240, 237, 168, 255);                     //  #f0eda8	// Yellow.
+  grounding2 = color(238, 238, 238, 30);                    //  #eeeeee	// Bone.
+
+  bground = grounding2;										                  // Color definitions.
+  onionSkin = grounding2;
+  seed = spot2;
+  halo = spot2;
+  shine = grounding1;
+  gradientFocus = support1;
+  gradientDiffuse = spot2;
+  // soulStroke = color(214, 3);                            // Legacy colors, please ignore.
+  // soulFill = color(0, 126, 255, 1);
+
+  // ~~~~~~~~~~~~~~~~~~ End Colors ~~~~~~~~~~~~~~~~~~ //
+
   background(bground);
 
   threshold = 150;                                          // Interaction distance, or range of effect between orbs.
@@ -47,11 +69,21 @@ function draw() {
   fill(onionSkin);
   rect(0, 0, width, height);
 
+  stroke(0, 10);                                                                  // Grid Background.
+  strokeWeight(1);
+	var ruleSpace = 50;
+	for(var x = 0; x < width; x += ruleSpace) {
+		line(x, 0, x, height);
+  }
+  for(var y = 0; y < height; y += ruleSpace) {
+  	line(0, y, width, y);
+  }
+
   for (var i = 0; i < souls.length; i++) {											                  // Invoke souls.
     // souls[i].show();
 
     if (soulsDistance > communionDistance) {                                      // Orb seed (pre/post orb location tracking.)
-      stroke(soulStroke);
+      stroke(seed);
       strokeWeight(10);
       point(souls[i].x, souls[i].y);
     }
@@ -76,7 +108,7 @@ function draw() {
           growD =	souls[i].d - (souls[i].d * distThreshRatio);
 
           // This block creates the gradient orbs.
-          stroke(soulStroke);                                                     // Halo, or corona surrounding orb.
+          stroke(halo);                                                     // Halo, or corona surrounding orb.
           strokeWeight(6);
           ellipse(souls[i].x, souls[i].y, growD, growD);
 
@@ -87,22 +119,25 @@ function draw() {
             lerpX = lerp(souls[i].x, souls[j].x, limit);
             lerpY = lerp(souls[i].y, souls[j].y, limit);
             noStroke();
-            fill(k / 1.5 * int(255 / souls[i].d), k * int(255 / souls[i].d)); // Tweak alpha for interest.
+            gradient = lerpColor(gradientDiffuse, gradientFocus, k / souls[i].d);
+            gradient.setAlpha(k * int(255 / souls[i].d));                         // Alpha interactive.
+            fill(gradient);
+            // fill(k / 1.5 * int(255 / souls[i].d), k * int(255 / souls[i].d));
             ellipse(lerpX, lerpY, growD - k,  growD - k);
           } // End gradient.
 
           // This block calculates distance between radii and centerpoint along line for shine, below.
-          vect1 = createVector(souls[i].x, souls[i].y);                         // Location vectors.
+          vect1 = createVector(souls[i].x, souls[i].y);                           // Location vectors.
           vect2 = createVector(souls[j].x, souls[j].y);
-          radFract1 = (souls[i].d/2) / soulsDistance;			                      // Get fraction radius1:dist.
-          radFract2 = (souls[j].d/2) / soulsDistance;                           // Get fraction radius2:dist.
-          lerpV1 = p5.Vector.lerp(vect1, vect2, radFract1);	                    // Interpolate per fraction1.
-          lerpV2 = p5.Vector.lerp(vect2, vect1, radFract2);	                    // Interpolate per fraction2.
-          vect3 = createVector(lerpV1.x, lerpV1.y);			                        // Location of perimeter point1.
-          vect4 = createVector(lerpV2.x, lerpV2.y);                             // Location of perimeter point2.
-          lerpPerimeters = p5.Vector.lerp(vect3, vect4, 0.5);                   // Set pt along perimeter line.
-          radAverage = (souls[i].d + souls[j].d) / 2;                           // Average radii.
-          radAverage = map(soulsDistance, communionDistance, 0, 0, radAverage); // Stretch with distance.
+          radFract1 = (souls[i].d/2) / soulsDistance;			                        // Get fraction radius1:dist.
+          radFract2 = (souls[j].d/2) / soulsDistance;                             // Get fraction radius2:dist.
+          lerpV1 = p5.Vector.lerp(vect1, vect2, radFract1);	                      // Interpolate per fraction1.
+          lerpV2 = p5.Vector.lerp(vect2, vect1, radFract2);	                      // Interpolate per fraction2.
+          vect3 = createVector(lerpV1.x, lerpV1.y);			                          // Location of perimeter point1.
+          vect4 = createVector(lerpV2.x, lerpV2.y);                               // Location of perimeter point2.
+          lerpPerimeters = p5.Vector.lerp(vect3, vect4, 0.5);                     // Set pt along perimeter line.
+          radAverage = (souls[i].d + souls[j].d) / 2;                             // Average radii.
+          radAverage = map(soulsDistance, communionDistance, 0, 0, radAverage);   // Stretch with distance.
 
           // stroke('red');                                                        // Dev/debug displays
           // noFill();
@@ -113,7 +148,8 @@ function draw() {
 
 
           // Shine between orbs from common center toward orb centers.
-          stroke(255, radAverage / 64);
+          stroke(shine);
+          shine.setAlpha(radAverage / 64);                                         // Alpha interactive.
           strokeWeight(1);
           r = radAverage;
           gain = 3;
