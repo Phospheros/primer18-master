@@ -69,14 +69,15 @@ function draw() {
   fill(onionSkin);
   rect(0, 0, width, height);
 
-  stroke(0, 10);                                                                  // Grid Background.
-  strokeWeight(1);
-	var ruleSpace = 50;
-	for(var x = 0; x < width; x += ruleSpace) {
-		line(x, 0, x, height);
-  }
-  for(var y = 0; y < height; y += ruleSpace) {
-  	line(0, y, width, y);
+  if (toggleGrid) {
+    stroke(0, 10);                                                                // Grid Background.
+    strokeWeight(1);
+    for (var x = 0; x < width; x += ruleSpace) {
+      line(x, 0, x, height);
+    }
+    for (var y = 0; y < height; y += ruleSpace) {
+      line(0, y, width, y);
+    }
   }
 
   for (var i = 0; i < souls.length; i++) {											                  // Invoke souls.
@@ -239,9 +240,15 @@ function windowResized() {									                 // Adaptive/responsive desig
 
 // ====================== UI ====================== //
 
-// function keyPressed() {
+var toggleGrid = false;
+var ruleSpace = 50;
+function keyPressed() {
+  if (key == 'g' || key == 'G') toggleGrid = !toggleGrid;
+  if (keyCode === UP_ARROW) ruleSpace++ ;
+  if (keyCode === DOWN_ARROW) ruleSpace-- ;
+  ruleSpace = constrain(ruleSpace, 1, 100);
 //     var timeStamp = (new Date).getTime();
 // 	if (key == 'i' || key == 'I') saveCanvas('river_frame_' + timeStamp, 'png');       // DEV PURPOSES ONLY -- REMOVE FOR GOLIVE !!!
-// }
+}
 
 // ====================== End ====================== //
