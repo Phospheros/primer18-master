@@ -25,22 +25,24 @@ function setup() {
 
   // ~~~~~~~~~~~~~~~~~~ Colors ~~~~~~~~~~~~~~~~~~ //
 
-  // Dayan's preliminary color palette.
-  grounding1 = color(47, 47, 47, 1);                      //  #2f2f2f	// Charcoal.
-  spot1 = color(101, 123, 123, 255);                        //  #657b7b	// Teal pastel.
-  spot2 = color(68, 109, 242, 30);                          //  #446df2	// Blue.
-  support1 = color(255, 149, 171, 30);                     //  #ff95ab	// Coral.
-  support2 = color(0, 183, 171, 255);                       //  #00b7ab	// Green.
-  support3 = color(240, 237, 168, 255);                     //  #f0eda8	// Yellow.
-  grounding2 = color(238, 238, 238, 30);                    //  #eeeeee	// Bone.
+  // Color Palette.
+  grounding1 = color(33, 50, 91, 15);                      //  #21325B	// Navy Blue.
+  spot1 = color(208, 247, 242, 10);                        //  #D0F7F2	// Icy Blue.     ?
+  spot2 = color(72, 112, 241, 255);                          //  #4870F1	// Royal Blue.
+  spot3 = color(72, 112, 241, 0);                          //  #4870F1	// Royal Blue Alpha.
+  support1 = color(255, 148, 170, 1);                     //  #FF94AA	// Pale Pink.
+  support2 = color(185, 185, 185, 255);                       //  #B9B9B9	// Warm Grey.
+  support3 = color(249, 240, 160, 25);                     //  #F9F0A0	// Light Yellow.
+  grounding2 = color(236, 236, 238, 30);                    //  #ECECEE	// Light Grey.
 
-  bground = grounding2;										                  // Color definitions.
-  onionSkin = grounding2;
-  seed = spot2;
-  halo = spot2;
-  shine = grounding1;
-  gradientFocus = support1;
-  gradientDiffuse = spot2;
+  // Color definitions.
+  bground = grounding2;
+  onionSkin = grounding2;                                   // (Lower alpha for some cool background painting.)
+  seed = grounding1;
+  halo = support3;
+  shine = spot3;
+  gradientFocus = spot2;
+  gradientDiffuse = support1;
   // soulStroke = color(214, 3);                            // Legacy colors, please ignore.
   // soulFill = color(0, 126, 255, 1);
 
@@ -111,6 +113,7 @@ function draw() {
           // This block creates the gradient orbs.
           stroke(halo);                                                     // Halo, or corona surrounding orb.
           strokeWeight(6);
+          noFill();
           ellipse(souls[i].x, souls[i].y, growD, growD);
 
           // Gradients.
@@ -121,8 +124,8 @@ function draw() {
             lerpY = lerp(souls[i].y, souls[j].y, limit);
             noStroke();
             gradient = lerpColor(gradientDiffuse, gradientFocus, k / souls[i].d);
-            gradient.setAlpha(k * int(255 / souls[i].d));                         // Alpha interactive.
             fill(gradient);
+            // gradient.setAlpha(k * int(255 / souls[i].d));                         // Alpha interactive.
             // fill(k / 1.5 * int(255 / souls[i].d), k * int(255 / souls[i].d));
             ellipse(lerpX, lerpY, growD - k,  growD - k);
           } // End gradient.
@@ -147,14 +150,14 @@ function draw() {
           // stroke(color('blue'));
           // ellipse(lerpPerimeters.x, lerpPerimeters.y, radAverage, radAverage);  // Show circle of averaged radii at centerpoint.
 
-
           // Shine between orbs from common center toward orb centers.
-          stroke(shine);
-          shine.setAlpha(radAverage / 64);                                         // Alpha interactive.
+          shine.setAlpha(growD / 200);                                         // Alpha interactive.
+					stroke(shine);
           strokeWeight(1);
           r = radAverage;
-          gain = 3;
-          for (var l = 0; l < 150; l++) {
+          gain = 1;
+          // Gaussian lines shine.
+          for (var l = 0; l < 50; l++) {
             x1 = randomGaussian(souls[i].x, (l + r) / gain);
             y1 = randomGaussian(souls[i].y, (l + r) / gain);
             x2 = randomGaussian(souls[j].x, (l + r) / gain);
@@ -162,6 +165,15 @@ function draw() {
             line(x1, y1, lerpPerimeters.x, lerpPerimeters.y);
             line(x2, y2, lerpPerimeters.x, lerpPerimeters.y);
           }
+          // Bezzier shine.
+					fill(shine);
+					for (var k = 0; k < 20; k++) {
+						var offset = 5000/growD;
+						bezier(lerpPerimeters.x + random(-offset, offset)/2, lerpPerimeters.y + random(-offset, offset)/2,
+						lerpPerimeters.x + random(-offset, offset), lerpPerimeters.y + random(-offset, offset),
+						lerpPerimeters.x + random(-offset, offset), lerpPerimeters.y + random(-offset, offset),
+						lerpPerimeters.x + random(-offset, offset)/2, lerpPerimeters.y + random(-offset, offset)/2);
+					}
 
         } // End Communion.
 
