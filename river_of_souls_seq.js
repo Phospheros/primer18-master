@@ -17,6 +17,7 @@ var radFract, limit, lerpX, lerpY;                          // Gradient variable
 var vect1, vect2, vect3, vect4, radFract1, radFract2;       // Distances between orb radii.
 var lerpV1, lerpV2, lerpPerimeters, radAverage;
 var r, gain, x1, y1, x2, y2;                                // Shine variables.
+var fade, toggleFade, restart;                              // Reinitialization variables.
 
 // ====================== Setup ====================== //
 
@@ -55,12 +56,17 @@ function setup() {
   windowRes = windowWidth * windowHeight;
   // soulNum = int(windowRes / 30000);
   // soulNum = constrain(soulNum, 12, 33);
-                                                        soulNum = 12; // Dev testing. Update windowResized also.
+  soulNum = 17;
 
   for (var i = 0; i < soulNum; i++) {												// Initialize souls.
     souls[i] = new Soul();
   }
-  // frameRate(30);
+
+  fade = 255;                                               // Restart, fade in/out.
+  toggleFade = false;
+  restart = 400;
+
+  noCursor();
 }
 
 // ====================== Draw ====================== //
@@ -206,6 +212,24 @@ function draw() {
     // }	// End glow.
 
   }	  // End for i.
+
+  // Fades and re-init block.
+  if (!toggleFade) {
+		fade -= 2;																						// Fade in.
+		fade = (fade < 30) ? 30 : fade;
+	}
+	else fade += 4;													  							// Fade out.
+
+	if (frameCount % restart == 0) {												// Re-init.
+		toggleFade = true;
+	}
+	if (fade >= 256) init();
+
+	onionSkin.setAlpha(fade);
+	noStroke();
+	fill(onionSkin);
+	rect(0, 0, width, height);
+
 }	// End draw.
 
 // ====================== Soul Object ====================== //
@@ -235,6 +259,16 @@ function Soul() {											                       // Setup.
 
 // ====================== Functions ====================== //
 
+function init() {																						// Re-init sketch, set fade parameters.
+	souls = [];
+	for (var i = 0; i < soulNum; i++) {
+		souls[i] = new Soul();
+	}
+	fade = 255;
+	frameCount = 0;
+	toggleFade = false;
+}
+
 function windowResized() {									                 // Adaptive/responsive design feature.
 	//resizeCanvas(windowWidth, windowHeight);				         // Does not work as well here as width, height.
     resizeCanvas(width, height);
@@ -251,6 +285,12 @@ function windowResized() {									                 // Adaptive/responsive desig
 }
 
 // ====================== UI ====================== //
+
+function mousePressed() {
+    var fullScreen = fullscreen();
+    resizeCanvas(displayWidth, displayHeight);
+    fullscreen(!fullScreen);
+}
 
 var toggleGrid = false;
 var ruleSpace = 50;
