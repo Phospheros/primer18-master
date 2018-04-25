@@ -27,13 +27,13 @@ function setup() {
   // ~~~~~~~~~~~~~~~~~~ Colors ~~~~~~~~~~~~~~~~~~ //
 
   // Color Palette.
-  grounding1 = color(33, 50, 91, 15);                      //  #21325B	// Navy Blue.
-  spot1 = color(208, 247, 242, 10);                        //  #D0F7F2	// Icy Blue.     ?
-  spot2 = color(72, 112, 241, 255);                          //  #4870F1	// Royal Blue.
-  spot3 = color(72, 112, 241, 0);                          //  #4870F1	// Royal Blue Alpha.
-  support1 = color(255, 148, 170, 1);                     //  #FF94AA	// Pale Pink.
-  support2 = color(185, 185, 185, 255);                       //  #B9B9B9	// Warm Grey.
-  support3 = color(249, 240, 160, 25);                     //  #F9F0A0	// Light Yellow.
+  grounding1 = color(33, 50, 91, 15);                       //  #21325B	// Navy Blue.
+  spot1 = color(208, 247, 242, 10);                         //  #D0F7F2	// Icy Blue.
+  spot2 = color(72, 112, 241, 255);                         //  #4870F1	// Royal Blue.
+  spot3 = color(72, 112, 241, 0);                           //  #4870F1	// Royal Blue Alpha.
+  support1 = color(255, 148, 170, 1);                       //  #FF94AA	// Pale Pink.
+  support2 = color(185, 185, 185, 255);                     //  #B9B9B9	// Warm Grey.
+  support3 = color(249, 240, 160, 25);                      //  #F9F0A0	// Light Yellow.
   grounding2 = color(236, 236, 238, 30);                    //  #ECECEE	// Light Grey.
 
   // Color definitions.
@@ -64,7 +64,7 @@ function setup() {
 
   fade = 255;                                               // Restart, fade in/out.
   toggleFade = false;
-  restart = 400;
+  restart = 20 * 120;                                       // Aproximate FPS times preferred runtime (in seconds).
 
   noCursor();
 }
@@ -78,8 +78,8 @@ function draw() {
   rect(0, 0, width, height);
 
   if (toggleGrid) {
-    stroke(0, 10);                                                                // Grid Background.
-    strokeWeight(1);
+    stroke(72, 112, 241, 10);                                                     // Grid Background.
+    strokeWeight(3);
     for (var x = 0; x < width; x += ruleSpace) {
       line(x, 0, x, height);
     }
@@ -117,7 +117,7 @@ function draw() {
           growD =	souls[i].d - (souls[i].d * distThreshRatio);
 
           // This block creates the gradient orbs.
-          stroke(halo);                                                     // Halo, or corona surrounding orb.
+          stroke(halo);                                                           // Halo, or corona surrounding orb.
           strokeWeight(6);
           noFill();
           ellipse(souls[i].x, souls[i].y, growD, growD);
@@ -215,12 +215,12 @@ function draw() {
 
   // Fades and re-init block.
   if (!toggleFade) {
-		fade -= 2;																						// Fade in.
+		fade -= 2;																						                        // Fade in.
 		fade = (fade < 30) ? 30 : fade;
 	}
-	else fade += 4;													  							// Fade out.
+	else fade += 4;													  							                        // Fade out.
 
-	if (frameCount % restart == 0) {												// Re-init.
+	if (frameCount % restart == 0 || frameRate() < 12) {												    // Re-init.
 		toggleFade = true;
 	}
 	if (fade >= 256) init();
@@ -267,6 +267,7 @@ function init() {																						// Re-init sketch, set fade parameters.
 	fade = 255;
 	frameCount = 0;
 	toggleFade = false;
+  toggleGrid = (int(random(4)) == 0) ? true : false;
 }
 
 function windowResized() {									                 // Adaptive/responsive design feature.
@@ -293,14 +294,12 @@ function mousePressed() {
 }
 
 var toggleGrid = false;
-var ruleSpace = 50;
+var ruleSpace = 64;
 function keyPressed() {
   if (key == 'g' || key == 'G') toggleGrid = !toggleGrid;
   if (keyCode === UP_ARROW) ruleSpace++ ;
   if (keyCode === DOWN_ARROW) ruleSpace-- ;
   ruleSpace = constrain(ruleSpace, 1, 100);
-//     var timeStamp = (new Date).getTime();
-// 	if (key == 'i' || key == 'I') saveCanvas('river_frame_' + timeStamp, 'png');       // DEV PURPOSES ONLY -- REMOVE FOR GOLIVE !!!
 }
 
 // ====================== End ====================== //
